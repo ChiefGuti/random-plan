@@ -1,7 +1,8 @@
+from unittest.mock import AsyncMock, patch
+
 import pytest
 import pytest_asyncio
-from httpx import AsyncClient, ASGITransport
-from unittest.mock import AsyncMock, patch
+from httpx import ASGITransport, AsyncClient
 
 from api.main import app
 
@@ -14,6 +15,11 @@ MOCK_PLAN = {
     "source_url": "https://example.com/babel-jazz",
     "event_date": "2026-04-24T20:00:00",
     "created_at": "2026-04-19T10:00:00+00:00",
+    "image_url": None,
+    "neighborhood": "Möllevången",
+    "duration_minutes": 120,
+    "price_range": "FREE",
+    "tips": "Arrive before 20:00 if you want a seat.",
 }
 
 
@@ -38,7 +44,7 @@ async def client():
 
 @pytest.mark.asyncio
 async def test_random_plan_returns_200(client):
-    with patch("api.main.fetch_random_plan", new=AsyncMock(return_value=MOCK_PLAN)):
+    with patch("api.main.get_cached_plans", new=AsyncMock(return_value=[MOCK_PLAN])):
         response = await client.get("/api/random-plan")
     assert response.status_code == 200
     data = response.json()
@@ -48,7 +54,7 @@ async def test_random_plan_returns_200(client):
 
 @pytest.mark.asyncio
 async def test_random_plan_returns_404_when_empty(client):
-    with patch("api.main.fetch_random_plan", new=AsyncMock(return_value=None)):
+    with patch("api.main.get_cached_plans", new=AsyncMock(return_value=[])):
         response = await client.get("/api/random-plan")
     assert response.status_code == 404
     assert response.json()["detail"] == "No active plans found."
@@ -56,7 +62,7 @@ async def test_random_plan_returns_404_when_empty(client):
 
 @pytest.mark.asyncio
 async def test_rate_limit_enforced(client):
-    with patch("api.main.fetch_random_plan", new=AsyncMock(return_value=MOCK_PLAN)):
+    with patch("api.main.get_cached_plans", new=AsyncMock(return_value=[MOCK_PLAN])):
         responses = [await client.get("/api/random-plan") for _ in range(11)]
     status_codes = [r.status_code for r in responses]
     assert 429 in status_codes, "Rate limit (10/min) should have triggered a 429"

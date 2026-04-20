@@ -22,6 +22,11 @@ MOCK_PLANS = [
         "source_url": "https://example.com/lilla-kafferosteriet",
         "event_date": None,
         "is_active": 1,
+        "neighborhood": "Möllevången",
+        "duration_minutes": 45,
+        "price_range": "BUDGET",
+        "tips": "Try the single-origin Ethiopian — they roast it in-house.",
+        "image_url": None,
     },
     {
         "id": str(uuid.uuid4()),
@@ -32,6 +37,11 @@ MOCK_PLANS = [
         "source_url": "https://example.com/malmo-live-rooftop",
         "event_date": None,
         "is_active": 1,
+        "neighborhood": "Centrum",
+        "duration_minutes": 30,
+        "price_range": "FREE",
+        "tips": "Weekday afternoons are almost always empty.",
+        "image_url": None,
     },
     {
         "id": str(uuid.uuid4()),
@@ -42,6 +52,11 @@ MOCK_PLANS = [
         "source_url": "https://example.com/babel-jazz-thursday",
         "event_date": "2026-04-24T20:00:00",
         "is_active": 1,
+        "neighborhood": "Möllevången",
+        "duration_minutes": 120,
+        "price_range": "FREE",
+        "tips": "Arrive before 20:00 if you want a seat — it fills up fast.",
+        "image_url": None,
     },
     {
         "id": str(uuid.uuid4()),
@@ -52,6 +67,11 @@ MOCK_PLANS = [
         "source_url": "https://example.com/mollan-loppis",
         "event_date": None,
         "is_active": 1,
+        "neighborhood": "Möllevången",
+        "duration_minutes": 90,
+        "price_range": "BUDGET",
+        "tips": "Bring cash — most vendors skip Swish. Arrive early.",
+        "image_url": None,
     },
     {
         "id": str(uuid.uuid4()),
@@ -62,20 +82,31 @@ MOCK_PLANS = [
         "source_url": "https://example.com/ribersborg-beach",
         "event_date": None,
         "is_active": 1,
+        "neighborhood": "Västra Hamnen",
+        "duration_minutes": 60,
+        "price_range": "FREE",
+        "tips": "Walk all the way to Kallbadhuset at the far end — worth it.",
+        "image_url": None,
     },
 ]
 
 CREATE_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS plans (
-    id          TEXT PRIMARY KEY,
-    title       TEXT NOT NULL,
-    description TEXT NOT NULL,
-    category    TEXT NOT NULL,
-    maps_url    TEXT NOT NULL,
-    source_url  TEXT NOT NULL UNIQUE,
-    event_date  TEXT,
-    created_at  TEXT NOT NULL,
-    is_active   INTEGER NOT NULL DEFAULT 1
+    id               TEXT PRIMARY KEY,
+    title            TEXT NOT NULL,
+    description      TEXT NOT NULL,
+    category         TEXT NOT NULL,
+    maps_url         TEXT NOT NULL,
+    source_url       TEXT NOT NULL UNIQUE,
+    event_date       TEXT,
+    created_at       TEXT NOT NULL,
+    is_active        INTEGER NOT NULL DEFAULT 1,
+    image_url        TEXT,
+    neighborhood     TEXT,
+    duration_minutes INTEGER,
+    price_range      TEXT DEFAULT 'FREE',
+    tips             TEXT,
+    updated_at       TEXT
 );
 """
 
@@ -93,13 +124,17 @@ async def seed():
             await client.execute(
                 """
                 INSERT OR IGNORE INTO plans
-                    (id, title, description, category, maps_url, source_url, event_date, created_at, is_active)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    (id, title, description, category, maps_url, source_url,
+                     event_date, created_at, is_active,
+                     image_url, neighborhood, duration_minutes, price_range, tips, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 [
                     plan["id"], plan["title"], plan["description"],
                     plan["category"], plan["maps_url"], plan["source_url"],
                     plan["event_date"], now, plan["is_active"],
+                    plan["image_url"], plan["neighborhood"], plan["duration_minutes"],
+                    plan["price_range"], plan["tips"], now,
                 ],
             )
             print(f"  Inserted: {plan['title']}")

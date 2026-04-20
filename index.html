@@ -14,21 +14,77 @@
       <p class="mt-2 text-zinc-400 text-sm">Malmö's hidden gems, one click away.</p>
     </div>
 
+    <div id="category-filters" class="flex flex-wrap gap-2 justify-center">
+      <button data-category="" class="filter-btn border-indigo-400 text-xs px-3 py-1 rounded-full border hover:border-indigo-400 text-white transition">All</button>
+      <button data-category="Food" class="filter-btn text-xs px-3 py-1 rounded-full border border-zinc-600 hover:border-indigo-400 text-zinc-400 hover:text-white transition">Food</button>
+      <button data-category="Event" class="filter-btn text-xs px-3 py-1 rounded-full border border-zinc-600 hover:border-indigo-400 text-zinc-400 hover:text-white transition">Event</button>
+      <button data-category="Oddity" class="filter-btn text-xs px-3 py-1 rounded-full border border-zinc-600 hover:border-indigo-400 text-zinc-400 hover:text-white transition">Oddity</button>
+      <button data-category="Outdoor" class="filter-btn text-xs px-3 py-1 rounded-full border border-zinc-600 hover:border-indigo-400 text-zinc-400 hover:text-white transition">Outdoor</button>
+    </div>
+
+    <!-- Saved pill + drawer -->
+    <div id="saved-section" class="hidden">
+      <button id="saved-pill" class="text-xs px-3 py-1 rounded-full border border-amber-500/50 text-amber-400 hover:border-amber-400 hover:text-amber-300 transition">
+        🔖 Saved <span id="saved-count" class="font-bold"></span>
+      </button>
+      <div id="saved-drawer" class="hidden mt-3 bg-zinc-900 border border-zinc-700 rounded-2xl p-4 text-left space-y-2">
+        <p class="text-xs font-semibold uppercase tracking-widest text-zinc-500">Saved Plans</p>
+        <ul id="saved-list" class="space-y-2"></ul>
+      </div>
+    </div>
+
     <!-- Plan card -->
-    <div id="plan-card" class="hidden bg-zinc-900 rounded-2xl p-6 text-left space-y-3 border border-zinc-800">
-      <span id="plan-category" class="text-xs font-semibold uppercase tracking-widest text-indigo-400"></span>
-      <h2 id="plan-title" class="text-xl font-bold"></h2>
-      <p id="plan-description" class="text-zinc-300 text-sm leading-relaxed"></p>
-      <div class="flex gap-3 pt-2">
+    <div id="plan-card" class="opacity-0 -translate-y-2 pointer-events-none bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-700 shadow-2xl transition-all duration-300 ease-out">
+
+      <!-- Zone 1 — Hero -->
+      <div id="plan-hero" class="relative h-40 sm:h-48 rounded-t-2xl overflow-hidden bg-zinc-800">
+        <img id="plan-image" src="" alt="" class="w-full h-full object-cover hidden">
+        <div id="plan-hero-gradient" class="absolute inset-0 bg-gradient-to-br from-indigo-600/30 to-zinc-900/60"></div>
+        <div class="absolute bottom-3 left-4">
+          <span id="plan-category" class="inline-flex items-center text-xs font-semibold uppercase tracking-widest text-indigo-300 bg-zinc-900/70 backdrop-blur-sm px-3 py-1.5 rounded-full border border-indigo-500/40"></span>
+        </div>
+      </div>
+
+      <!-- Zone 2 — Body -->
+      <div class="p-5 sm:p-7 space-y-4">
+        <h2 id="plan-title" class="text-xl sm:text-2xl font-extrabold text-white leading-tight"></h2>
+
+        <!-- Metadata pills row -->
+        <div id="plan-meta" class="flex flex-wrap gap-2">
+          <span id="plan-date-pill" class="hidden items-center gap-1.5 text-xs font-medium text-zinc-300 bg-zinc-800/70 px-3 py-1.5 rounded-full border border-zinc-700">📅 <span id="plan-date-text"></span></span>
+          <span id="plan-neighborhood-pill" class="hidden items-center gap-1.5 text-xs font-medium text-zinc-300 bg-zinc-800/70 px-3 py-1.5 rounded-full border border-zinc-700">📍 <span id="plan-neighborhood-text"></span></span>
+          <span id="plan-duration-pill" class="hidden items-center gap-1.5 text-xs font-medium text-zinc-300 bg-zinc-800/70 px-3 py-1.5 rounded-full border border-zinc-700">⏱ <span id="plan-duration-text"></span></span>
+          <span id="plan-price-pill" class="hidden items-center gap-1.5 text-xs font-medium text-zinc-300 bg-zinc-800/70 px-3 py-1.5 rounded-full border border-zinc-700">💰 <span id="plan-price-text"></span></span>
+        </div>
+
+        <p id="plan-description" class="text-zinc-300 text-sm leading-relaxed"></p>
+
+        <!-- Expandable tips section -->
+        <div id="plan-tips-wrapper" class="hidden">
+          <button id="plan-tips-toggle" class="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition">
+            <span id="plan-tips-chevron" class="inline-block transition-transform duration-200">▸</span>
+            <span>Local tip</span>
+          </button>
+          <div id="plan-tips-body" class="hidden mt-2 bg-zinc-800/50 border border-zinc-700/50 rounded-lg px-4 py-3 text-sm text-zinc-300">
+            <span class="text-indigo-400 mr-1.5">✓</span><span id="plan-tips-text"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zone 3 — Actions -->
+      <div class="px-5 sm:px-7 pb-5 sm:pb-7 flex gap-2 flex-wrap">
         <a id="plan-maps" href="#" target="_blank" rel="noopener noreferrer"
-           class="text-xs bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg font-medium transition">
+           class="flex-1 text-center text-xs bg-indigo-600 hover:bg-indigo-500 px-4 py-2.5 rounded-lg font-semibold transition">
           Open in Maps
         </a>
         <a id="plan-source" href="#" target="_blank" rel="noopener noreferrer"
-           class="text-xs text-zinc-400 hover:text-white px-4 py-2 rounded-lg border border-zinc-700 hover:border-zinc-500 transition">
+           class="text-xs text-zinc-400 hover:text-white px-4 py-2.5 rounded-lg border border-zinc-700 hover:border-zinc-500 transition font-medium">
           Source
         </a>
+        <button id="plan-share" class="hidden text-xs text-zinc-400 hover:text-white px-4 py-2.5 rounded-lg border border-zinc-700 hover:border-zinc-500 transition font-medium">Share</button>
+        <button id="plan-save" class="hidden text-xs text-zinc-400 hover:text-amber-400 px-3 py-2.5 rounded-lg border border-zinc-700 hover:border-amber-500/50 transition" title="Save for later">🔖</button>
       </div>
+
     </div>
 
     <!-- Error messages -->

@@ -4,12 +4,12 @@ Fetches pages, parses them, and upserts results into Turso.
 """
 import asyncio
 import os
-import uuid
 from datetime import datetime, timezone
 
 import httpx
 import libsql_client
 from dotenv import load_dotenv
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from scraper.parsers import parse_malmo_blog
 
@@ -23,16 +23,42 @@ SOURCES = [
 ]
 
 UPSERT_SQL = """
-INSERT INTO plans (id, title, description, category, maps_url, source_url, event_date, created_at, is_active)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+INSERT INTO plans (id, title, description, category, maps_url, source_url, event_date, created_at, is_active,
+                   image_url, neighborhood, duration_minutes, price_range, tips, updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?)
 ON CONFLICT(source_url) DO UPDATE SET
-    title       = excluded.title,
-    description = excluded.description,
-    category    = excluded.category,
-    maps_url    = excluded.maps_url,
-    event_date  = excluded.event_date,
-    is_active   = 1;
+    title            = excluded.title,
+    description      = excluded.description,
+    category         = excluded.category,
+    maps_url         = excluded.maps_url,
+    event_date       = excluded.event_date,
+    image_url        = excluded.image_url,
+    neighborhood     = excluded.neighborhood,
+    duration_minutes = excluded.duration_minutes,
+    price_range      = excluded.price_range,
+    tips             = excluded.tips,
+    updated_at       = excluded.updated_at,
+    is_active        = 1;
 """
+
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (compatible; RandomPlanBot/1.0; "
+        "+https://github.com/ChiefGuti/random-plan)"
+    )
+}
+
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    retry=retry_if_exception_type((httpx.HTTPStatusError, httpx.TimeoutException)),
+    reraise=True,
+)
+async def fetch_with_retry(http_client: httpx.AsyncClient, url: str) -> httpx.Response:
+    response = await http_client.get(url, headers=HEADERS)
+    response.raise_for_status()
+    return response
 
 
 async def upsert_plan(client: libsql_client.Client, plan: dict):
@@ -48,8 +74,30 @@ async def upsert_plan(client: libsql_client.Client, plan: dict):
             plan["source_url"],
             plan.get("event_date"),
             now,
+            plan.get("image_url"),
+            plan.get("neighborhood"),
+            plan.get("duration_minutes"),
+            plan.get("price_range"),
+            plan.get("tips"),
+            plan.get("updated_at", now),
         ],
     )
+
+
+async def expire_past_events(client: libsql_client.Client):
+    """Set is_active=0 for events whose event_date has passed."""
+    now = datetime.now(timezone.utc).isoformat()
+    await client.execute(
+        """
+        UPDATE plans
+        SET is_active = 0
+        WHERE event_date IS NOT NULL
+          AND event_date < ?
+          AND is_active = 1
+        """,
+        [now],
+    )
+    print("Expired past events.")
 
 
 async def run_scraper():
@@ -60,14 +108,15 @@ async def run_scraper():
         async with httpx.AsyncClient(timeout=15) as http_client:
             for source in SOURCES:
                 try:
-                    response = await http_client.get(source["url"])
-                    response.raise_for_status()
+                    response = await fetch_with_retry(http_client, source["url"])
                     plans = source["parser"](response.text)
                     for plan in plans:
                         await upsert_plan(db_client, plan)
                     print(f"Upserted {len(plans)} plans from {source['url']}")
                 except Exception as e:
                     print(f"ERROR scraping {source['url']}: {e}")
+
+        await expire_past_events(db_client)
 
 
 if __name__ == "__main__":
