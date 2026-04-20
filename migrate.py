@@ -21,6 +21,7 @@ MIGRATIONS = [
 
 
 async def migrate():
+    """Add new columns to the plans table. Safe to run multiple times — existing columns are skipped."""
     async with libsql_client.create_client(
         url=os.environ["TURSO_DATABASE_URL"],
         auth_token=os.environ["TURSO_AUTH_TOKEN"],

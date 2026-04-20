@@ -22,6 +22,8 @@ _start_time = _time.time()
 
 
 def get_real_ip(request: Request) -> str:
+    """Extract the originating client IP, trusting X-Forwarded-For only for the
+    first (leftmost) address to prevent spoofing by the client."""
     forwarded = request.headers.get("X-Forwarded-For")
     if forwarded:
         return forwarded.split(",")[0].strip()
@@ -36,7 +38,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Public read-only API — wildcard CORS is intentional
     allow_methods=["GET"],
     allow_headers=["*"],
 )
@@ -53,6 +55,7 @@ async def index():
 @app.get("/api/random-plan")
 @limiter.limit("10/minute")
 async def random_plan(request: Request, category: Optional[str] = None):
+    """Return a random active plan, optionally filtered by category."""
     try:
         plans = await get_cached_plans(fetch_all_active_plans)
     except Exception as exc:
@@ -67,6 +70,7 @@ async def random_plan(request: Request, category: Optional[str] = None):
 
 @app.get("/api/categories")
 async def list_categories():
+    """Return a sorted list of all distinct categories among active plans."""
     try:
         plans = await get_cached_plans(fetch_all_active_plans)
     except Exception as exc:
@@ -78,6 +82,7 @@ async def list_categories():
 @app.get("/api/plans/{plan_id}")
 @limiter.limit("30/minute")
 async def get_plan(request: Request, plan_id: str):
+    """Return a single active plan by ID, or 404 if not found."""
     plan = await fetch_plan_by_id(plan_id)
     if not plan:
         return JSONResponse(status_code=404, content={"detail": "Plan not found."})

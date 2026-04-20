@@ -10,8 +10,15 @@ from bs4 import BeautifulSoup
 
 def parse_malmo_blog(html: str) -> list[dict]:
     """
-    Example parser for a Malmö events listing page.
-    Adapt selectors to the real site structure as needed.
+    Parse visitmalmo.com events listing HTML into plan dicts.
+
+    Selectors (.event-card / .event-title / .event-description) are
+    placeholder values — update them once the live page structure is confirmed
+    (the source URL currently returns 404).
+
+    Fields that cannot be reliably scraped (neighborhood, duration_minutes,
+    tips) are left as None for manual curation. price_range defaults to FREE
+    as the site provides no structured pricing data.
     """
     soup = BeautifulSoup(html, "html.parser")
     plans = []
@@ -45,7 +52,7 @@ def parse_malmo_blog(html: str) -> list[dict]:
                 "image_url": og_image,
                 "neighborhood": None,
                 "duration_minutes": None,
-                "price_range": "FREE",
+                "price_range": "FREE",  # no pricing data on this source; override manually
                 "tips": None,
                 "updated_at": datetime.now(timezone.utc).isoformat(),
             }

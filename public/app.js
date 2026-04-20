@@ -180,7 +180,7 @@ function updateSaveButton(planId) {
   const btn = document.getElementById("plan-save");
   const saved = getSaved();
   const isSaved = saved.some(s => s.id === planId);
-  btn.textContent = isSaved ? "🔖" : "🔖";
+  btn.textContent = isSaved ? "🔖" : "☆";
   btn.classList.toggle("text-amber-400", isSaved);
   btn.classList.toggle("border-amber-500/50", isSaved);
   btn.classList.toggle("text-zinc-400", !isSaved);

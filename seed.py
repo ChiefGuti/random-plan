@@ -112,6 +112,7 @@ CREATE TABLE IF NOT EXISTS plans (
 
 
 async def seed():
+    """Create the plans table if needed and insert mock plans. Uses INSERT OR IGNORE — safe to re-run, existing rows are skipped."""
     async with libsql_client.create_client(
         url=os.environ["TURSO_DATABASE_URL"],
         auth_token=os.environ["TURSO_AUTH_TOKEN"],
