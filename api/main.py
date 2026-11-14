@@ -60,7 +60,9 @@ async def random_plan(request: Request, category: Optional[str] = None):
         plans = await get_cached_plans(fetch_all_active_plans)
     except Exception as exc:
         logger.exception("Database fetch failed: %s", exc)
-        return JSONResponse(status_code=503, content={"detail": "Database temporarily unavailable."})
+        return JSONResponse(
+            status_code=503, content={"detail": "Database temporarily unavailable."}
+        )
     if category:
         plans = [p for p in plans if p["category"].lower() == category.lower()]
     if not plans:
@@ -75,7 +77,9 @@ async def list_categories():
         plans = await get_cached_plans(fetch_all_active_plans)
     except Exception as exc:
         logger.exception("Database fetch failed: %s", exc)
-        return JSONResponse(status_code=503, content={"detail": "Database temporarily unavailable."})
+        return JSONResponse(
+            status_code=503, content={"detail": "Database temporarily unavailable."}
+        )
     return sorted({p["category"] for p in plans})
 
 

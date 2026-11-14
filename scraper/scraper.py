@@ -2,6 +2,7 @@
 Main scraper script — run daily by GitHub Actions.
 Fetches pages, parses them, and upserts results into Turso.
 """
+
 import asyncio
 import os
 from datetime import datetime, timezone
@@ -43,8 +44,7 @@ ON CONFLICT(source_url) DO UPDATE SET
 
 HEADERS = {
     "User-Agent": (
-        "Mozilla/5.0 (compatible; RandomPlanBot/1.0; "
-        "+https://github.com/ChiefGuti/random-plan)"
+        "Mozilla/5.0 (compatible; RandomPlanBot/1.0; +https://github.com/ChiefGuti/random-plan)"
     )
 }
 

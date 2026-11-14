@@ -24,9 +24,19 @@ async def fetch_all_active_plans() -> list[dict]:
             "FROM plans WHERE is_active = 1"
         )
     cols = (
-        "id", "title", "description", "category", "maps_url", "source_url",
-        "event_date", "created_at",
-        "image_url", "neighborhood", "duration_minutes", "price_range", "tips",
+        "id",
+        "title",
+        "description",
+        "category",
+        "maps_url",
+        "source_url",
+        "event_date",
+        "created_at",
+        "image_url",
+        "neighborhood",
+        "duration_minutes",
+        "price_range",
+        "tips",
     )
     return [dict(zip(cols, row)) for row in result.rows]
 
@@ -44,8 +54,18 @@ async def fetch_plan_by_id(plan_id: str) -> dict | None:
             return None
         row = result.rows[0]
         cols = (
-            "id", "title", "description", "category", "maps_url", "source_url",
-            "event_date", "created_at", "image_url", "neighborhood",
-            "duration_minutes", "price_range", "tips",
+            "id",
+            "title",
+            "description",
+            "category",
+            "maps_url",
+            "source_url",
+            "event_date",
+            "created_at",
+            "image_url",
+            "neighborhood",
+            "duration_minutes",
+            "price_range",
+            "tips",
         )
         return dict(zip(cols, row))

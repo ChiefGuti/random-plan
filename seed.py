@@ -2,6 +2,7 @@
 One-off script to create the plans table and populate it with 5 mock Malmö plans.
 Run with: python seed.py
 """
+
 import asyncio
 import os
 import uuid
@@ -131,11 +132,21 @@ async def seed():
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 [
-                    plan["id"], plan["title"], plan["description"],
-                    plan["category"], plan["maps_url"], plan["source_url"],
-                    plan["event_date"], now, plan["is_active"],
-                    plan["image_url"], plan["neighborhood"], plan["duration_minutes"],
-                    plan["price_range"], plan["tips"], now,
+                    plan["id"],
+                    plan["title"],
+                    plan["description"],
+                    plan["category"],
+                    plan["maps_url"],
+                    plan["source_url"],
+                    plan["event_date"],
+                    now,
+                    plan["is_active"],
+                    plan["image_url"],
+                    plan["neighborhood"],
+                    plan["duration_minutes"],
+                    plan["price_range"],
+                    plan["tips"],
+                    now,
                 ],
             )
             print(f"  Inserted: {plan['title']}")

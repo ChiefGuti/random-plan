@@ -2,6 +2,7 @@
 One-off migration script to add new columns to the plans table.
 Run with: python migrate.py
 """
+
 import asyncio
 import os
 
@@ -11,12 +12,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 MIGRATIONS = [
-    ("image_url",         "ALTER TABLE plans ADD COLUMN image_url TEXT;"),
-    ("neighborhood",      "ALTER TABLE plans ADD COLUMN neighborhood TEXT;"),
-    ("duration_minutes",  "ALTER TABLE plans ADD COLUMN duration_minutes INTEGER;"),
-    ("price_range",       "ALTER TABLE plans ADD COLUMN price_range TEXT DEFAULT 'FREE';"),
-    ("tips",              "ALTER TABLE plans ADD COLUMN tips TEXT;"),
-    ("updated_at",        "ALTER TABLE plans ADD COLUMN updated_at TEXT;"),
+    ("image_url", "ALTER TABLE plans ADD COLUMN image_url TEXT;"),
+    ("neighborhood", "ALTER TABLE plans ADD COLUMN neighborhood TEXT;"),
+    ("duration_minutes", "ALTER TABLE plans ADD COLUMN duration_minutes INTEGER;"),
+    ("price_range", "ALTER TABLE plans ADD COLUMN price_range TEXT DEFAULT 'FREE';"),
+    ("tips", "ALTER TABLE plans ADD COLUMN tips TEXT;"),
+    ("updated_at", "ALTER TABLE plans ADD COLUMN updated_at TEXT;"),
 ]
 
 

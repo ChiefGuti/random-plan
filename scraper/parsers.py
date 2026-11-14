@@ -2,6 +2,7 @@
 HTML extraction logic — one function per source site.
 Each parser takes raw HTML and returns a list of Plan dicts.
 """
+
 import uuid
 from datetime import datetime, timezone
 

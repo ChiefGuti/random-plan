@@ -4,6 +4,7 @@ Uses fake HTML that matches the placeholder selectors in parse_malmo_blog.
 When the real visitmalmo.com structure is confirmed, update the HTML fixtures
 and selectors together.
 """
+
 from scraper.parsers import parse_malmo_blog
 
 VALID_CARD_HTML = """
