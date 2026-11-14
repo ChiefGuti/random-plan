@@ -117,10 +117,10 @@ Covers: HTTP 200 (valid plan), HTTP 404 (no active plans), HTTP 429 (rate limit 
 
 ## Deployment
 
-**Vercel** (automatic on push to `main`):
+**Vercel** — manual only. Pushing to `main` does not deploy (no auto-deploy, by choice for now):
 
 ```bash
-vercel --prod   # manual production deploy
+vercel --prod   # production deploy
 ```
 
 `vercel.json` rewrites all `/api/*` requests to `api/main.py`. Static files are served by Vercel's CDN.
